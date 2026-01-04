@@ -118,6 +118,7 @@ import org.apache.commons.lang3.stream.Streams;
  * The symbol {@code *} is used to indicate any input including {@code null}.</p>
  *
  * <p>#ThreadSafe#</p>
+ *
  * @see String
  * @since 1.0
  */
@@ -154,6 +155,7 @@ public class StringUtils {
 
     /**
      * The empty String {@code ""}.
+     *
      * @since 2.0
      */
     public static final String EMPTY = "";
@@ -183,6 +185,7 @@ public class StringUtils {
 
     /**
      * Represents a failed index search.
+     *
      * @since 2.1
      */
     public static final int INDEX_NOT_FOUND = -1;
@@ -502,6 +505,18 @@ public class StringUtils {
     @Deprecated
     public static String appendIfMissingIgnoreCase(final String str, final CharSequence suffix, final CharSequence... suffixes) {
         return Strings.CI.appendIfMissing(str, suffix, suffixes);
+    }
+
+    /**
+     * Computes the capacity required for a StringBuilder to hold {@code items} of {@code maxElementChars} characters plus the separators between them. The
+     * separator is assumed to be 1 character.
+     *
+     * @param count           The number of items.
+     * @param maxElementChars The maximum number of characters per item.
+     * @return A StringBuilder with the appropriate capacity.
+     */
+    private static StringBuilder capacity(final int count, final byte maxElementChars) {
+        return new StringBuilder(count * maxElementChars + count - 1);
     }
 
     /**
@@ -1031,10 +1046,10 @@ public class StringUtils {
      * StringUtils.containsAny("", *)                    = false
      * StringUtils.containsAny(*, null)                  = false
      * StringUtils.containsAny(*, [])                    = false
-     * StringUtils.containsAny("zzabyycdxx", ['z', 'a']) = true
-     * StringUtils.containsAny("zzabyycdxx", ['b', 'y']) = true
-     * StringUtils.containsAny("zzabyycdxx", ['z', 'y']) = true
-     * StringUtils.containsAny("aba", ['z'])             = false
+     * StringUtils.containsAny("zzabyycdxx", 'z', 'a')   = true
+     * StringUtils.containsAny("zzabyycdxx", 'b', 'y')   = true
+     * StringUtils.containsAny("zzabyycdxx", 'z', 'y')   = true
+     * StringUtils.containsAny("aba", 'z])               = false
      * </pre>
      *
      * @param cs          the CharSequence to check, may be null.
@@ -1198,13 +1213,13 @@ public class StringUtils {
      * </p>
      *
      * <pre>
-     * StringUtils.containsNone(null, *)       = true
-     * StringUtils.containsNone(*, null)       = true
-     * StringUtils.containsNone("", *)         = true
-     * StringUtils.containsNone("ab", '')      = true
-     * StringUtils.containsNone("abab", 'xyz') = true
-     * StringUtils.containsNone("ab1", 'xyz')  = true
-     * StringUtils.containsNone("abz", 'xyz')  = false
+     * StringUtils.containsNone(null, *)               = true
+     * StringUtils.containsNone(*, null)               = true
+     * StringUtils.containsNone("", *)                 = true
+     * StringUtils.containsNone("ab", '')              = true
+     * StringUtils.containsNone("abab", 'x', 'y', 'z') = true
+     * StringUtils.containsNone("ab1", 'x', 'y', 'z')  = true
+     * StringUtils.containsNone("abz", 'x', 'y', 'z')  = false
      * </pre>
      *
      * @param cs          the CharSequence to check, may be null.
@@ -1274,13 +1289,13 @@ public class StringUtils {
      * </p>
      *
      * <pre>
-     * StringUtils.containsOnly(null, *)       = false
-     * StringUtils.containsOnly(*, null)       = false
-     * StringUtils.containsOnly("", *)         = true
-     * StringUtils.containsOnly("ab", '')      = false
-     * StringUtils.containsOnly("abab", 'abc') = true
-     * StringUtils.containsOnly("ab1", 'abc')  = false
-     * StringUtils.containsOnly("abz", 'abc')  = false
+     * StringUtils.containsOnly(null, *)               = false
+     * StringUtils.containsOnly(*, null)               = false
+     * StringUtils.containsOnly("", *)                 = true
+     * StringUtils.containsOnly("ab", '')              = false
+     * StringUtils.containsOnly("abab", 'a', 'b', 'c') = true
+     * StringUtils.containsOnly("ab1", 'a', 'b', 'c')  = false
+     * StringUtils.containsOnly("abz", 'a', 'b', 'c')  = false
      * </pre>
      *
      * @param cs    the String to check, may be null.
@@ -2696,9 +2711,9 @@ public class StringUtils {
      * StringUtils.indexOfAny("", *)                    = -1
      * StringUtils.indexOfAny(*, null)                  = -1
      * StringUtils.indexOfAny(*, [])                    = -1
-     * StringUtils.indexOfAny("zzabyycdxx", ['z', 'a']) = 0
-     * StringUtils.indexOfAny("zzabyycdxx", ['b', 'y']) = 3
-     * StringUtils.indexOfAny("aba", ['z'])             = -1
+     * StringUtils.indexOfAny("zzabyycdxx", 'z', 'a')   = 0
+     * StringUtils.indexOfAny("zzabyycdxx", 'b', 'y')   = 3
+     * StringUtils.indexOfAny("aba", 'z')               = -1
      * </pre>
      *
      * @param cs          the CharSequence to check, may be null.
@@ -2721,16 +2736,16 @@ public class StringUtils {
      * </p>
      *
      * <pre>
-     * StringUtils.indexOfAny(null, *)                      = -1
-     * StringUtils.indexOfAny(*, null)                      = -1
-     * StringUtils.indexOfAny(*, [])                        = -1
-     * StringUtils.indexOfAny("zzabyycdxx", ["ab", "cd"])   = 2
-     * StringUtils.indexOfAny("zzabyycdxx", ["cd", "ab"])   = 2
-     * StringUtils.indexOfAny("zzabyycdxx", ["mn", "op"])   = -1
-     * StringUtils.indexOfAny("zzabyycdxx", ["zab", "aby"]) = 1
-     * StringUtils.indexOfAny("zzabyycdxx", [""])           = 0
-     * StringUtils.indexOfAny("", [""])                     = 0
-     * StringUtils.indexOfAny("", ["a"])                    = -1
+     * StringUtils.indexOfAny(null, *)                    = -1
+     * StringUtils.indexOfAny(*, null)                    = -1
+     * StringUtils.indexOfAny(*, [])                      = -1
+     * StringUtils.indexOfAny("zzabyycdxx", "ab", "cd")   = 2
+     * StringUtils.indexOfAny("zzabyycdxx", "cd", "ab")   = 2
+     * StringUtils.indexOfAny("zzabyycdxx", "mn", "op")   = -1
+     * StringUtils.indexOfAny("zzabyycdxx", "zab", "aby") = 1
+     * StringUtils.indexOfAny("zzabyycdxx", "")           = 0
+     * StringUtils.indexOfAny("", "")                     = 0
+     * StringUtils.indexOfAny("", "a")                    = -1
      * </pre>
      *
      * @param str        the CharSequence to check, may be null.
@@ -3854,19 +3869,21 @@ public class StringUtils {
      * @since 3.12.0
      */
     public static String join(final boolean[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder(array.length * 5 + array.length - 1);
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 5; // "false"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -3929,19 +3946,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final byte[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 4; // "-128"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4004,19 +4023,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final char[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder(array.length * 2 - 1);
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 1;
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4079,19 +4100,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final double[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 22; // "1.7976931348623157E308"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4154,19 +4177,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final float[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 12; // "3.4028235E38"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4229,19 +4254,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final int[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 11; // "-2147483648"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4467,19 +4494,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final long[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 20; // "-9223372036854775808"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4661,19 +4690,21 @@ public class StringUtils {
      * @since 3.2
      */
     public static String join(final short[] array, final char delimiter, final int startIndex, final int endIndex) {
+        // See StringUtilsJoinBenchmark
         if (array == null) {
             return null;
         }
-        if (endIndex - startIndex <= 0) {
+        final int count = endIndex - startIndex;
+        if (count <= 0) {
             return EMPTY;
         }
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (int i = startIndex; i < endIndex; i++) {
-            stringBuilder
-                    .append(array[i])
-                    .append(delimiter);
+        final byte maxElementChars = 6; // "-32768"
+        final StringBuilder stringBuilder = capacity(count, maxElementChars);
+        stringBuilder.append(array[startIndex]);
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            stringBuilder.append(delimiter).append(array[i]);
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
@@ -4687,8 +4718,8 @@ public class StringUtils {
      * StringUtils.join(null)            = null
      * StringUtils.join([])              = ""
      * StringUtils.join([null])          = ""
-     * StringUtils.join(["a", "b", "c"]) = "abc"
-     * StringUtils.join([null, "", "a"]) = "a"
+     * StringUtils.join("a", "b", "c")   = "abc"
+     * StringUtils.join(null, "", "a")   = "a"
      * </pre>
      *
      * @param <T>      the specific type of values to join together.
@@ -4710,10 +4741,10 @@ public class StringUtils {
      * </p>
      *
      * <pre>
-     * StringUtils.joinWith(",", {"a", "b"})        = "a,b"
-     * StringUtils.joinWith(",", {"a", "b",""})     = "a,b,"
-     * StringUtils.joinWith(",", {"a", null, "b"})  = "a,,b"
-     * StringUtils.joinWith(null, {"a", "b"})       = "ab"
+     * StringUtils.joinWith(",", "a", "b")        = "a,b"
+     * StringUtils.joinWith(",", "a", "b","")     = "a,b,"
+     * StringUtils.joinWith(",", "a", null, "b")  = "a,,b"
+     * StringUtils.joinWith(null, "a", "b")       = "ab"
      * </pre>
      *
      * @param delimiter the separator character to use, null treated as "".
@@ -8691,8 +8722,8 @@ public class StringUtils {
      * @param charsetName the encoding to use, if null then use the platform default.
      * @return a new String.
      * @throws NullPointerException if the input is null.
-     * @deprecated Use {@link StringUtils#toEncodedString(byte[], Charset)} instead of String constants in your code.
      * @since 3.1
+     * @deprecated Use {@link StringUtils#toEncodedString(byte[], Charset)} instead of String constants in your code.
      */
     @Deprecated
     public static String toString(final byte[] bytes, final String charsetName) {
@@ -8876,14 +8907,10 @@ public class StringUtils {
         if (str == null) {
             return null;
         }
-        if (offset > str.length()) {
-            return EMPTY;
-        }
-        if (str.length() > maxWidth) {
-            final int ix = Math.min(offset + maxWidth, str.length());
-            return str.substring(offset, ix);
-        }
-        return str.substring(offset);
+        final int len = str.length();
+        final int start = Math.min(offset, len);
+        final int end = offset > len - maxWidth ? len : offset + maxWidth;
+        return str.substring(start, Math.min(end, len));
     }
 
     /**
